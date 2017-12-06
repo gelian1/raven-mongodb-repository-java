@@ -6,7 +6,6 @@ import raven.data.entity.annotations.*;
 
 @BsonPropertyFormat(BsonPropertyFormatType.PascalCase)
 public final class User implements AutoIncr<Long> {
-
     @BsonId()
     private Long id;
 

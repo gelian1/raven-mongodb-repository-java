@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 
 @BsonPropertyFormat(BsonPropertyFormatType.PascalCase)
 public class User2 implements AutoIncr<Long> {
-
     @BsonId()
     private Long id;
 
