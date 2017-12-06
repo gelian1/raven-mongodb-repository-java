@@ -72,10 +72,10 @@ public class MongoReaderRepositoryTest {
             user = repos.get(i);
             Assert.assertNotNull(user);
 
-            user = repos.get(Filters.eq("name", user.getName()));
+            user = repos.get(Filters.eq("Name", user.getName()));
             Assert.assertNotNull(user);
 
-            user = repos.get(Filters.eq("name", user.getName()), new ArrayList<String>() {{
+            user = repos.get(Filters.eq("Name", user.getName()), new ArrayList<String>() {{
                 add("_id");
             }});
             Assert.assertEquals(user.getName(), null);

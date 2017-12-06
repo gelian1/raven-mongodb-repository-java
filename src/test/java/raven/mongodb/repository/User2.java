@@ -3,12 +3,11 @@ package raven.mongodb.repository;
 import org.bson.codecs.pojo.annotations.BsonId;
 import raven.data.entity.AutoIncr;
 import raven.data.entity.EntityLongKey;
-import raven.data.entity.annotations.BsonFormatProperty;
-import raven.data.entity.annotations.BsonFormatType;
+import raven.data.entity.annotations.*;
 
 import java.time.LocalDateTime;
 
-@BsonFormatProperty(BsonFormatType.Pascal)
+@BsonPropertyFormat(BsonPropertyFormatType.PascalCase)
 public class User2 implements EntityLongKey, AutoIncr {
 
     @BsonId()

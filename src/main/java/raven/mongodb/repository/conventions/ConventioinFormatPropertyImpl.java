@@ -14,15 +14,15 @@ public class ConventioinFormatPropertyImpl implements Convention {
     @Override
     public void apply(final ClassModelBuilder<?> classModelBuilder) {
 
-        BsonFormatType formatType = BsonFormatType.Camel;
+        BsonPropertyFormatType formatType = BsonPropertyFormatType.CamelCase;
         for (final Annotation annotation : classModelBuilder.getAnnotations()) {
-            if(annotation instanceof BsonFormatProperty){
-                formatType = ((BsonFormatProperty)annotation).value();
+            if(annotation instanceof BsonPropertyFormat){
+                formatType = ((BsonPropertyFormat)annotation).value();
                 break;
             }
         }
 
-        if(formatType == BsonFormatType.Camel)
+        if(formatType == BsonPropertyFormatType.CamelCase)
             return;
 
         for (PropertyModelBuilder<?> propertyModelBuilder : classModelBuilder.getPropertyModelBuilders()) {

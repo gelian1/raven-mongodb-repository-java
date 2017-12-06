@@ -2,10 +2,9 @@ package raven.mongodb.repository;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 import raven.data.entity.*;
-import raven.data.entity.annotations.BsonFormatProperty;
-import raven.data.entity.annotations.BsonFormatType;
+import raven.data.entity.annotations.*;
 
-@BsonFormatProperty(BsonFormatType.Pascal)
+@BsonPropertyFormat(BsonPropertyFormatType.PascalCase)
 public final class User implements EntityLongKey, AutoIncr {
 
     @BsonId()
