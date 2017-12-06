@@ -1,28 +1,28 @@
 package raven.mongodb.repository;
 
 import org.bson.codecs.pojo.annotations.BsonId;
-import raven.data.entity.*;
-import raven.data.entity.annotations.*;
-
-import java.time.LocalDateTime;
+import raven.data.entity.Entity;
+import raven.data.entity.annotations.BsonPropertyFormat;
+import raven.data.entity.annotations.BsonPropertyFormatType;
 
 @BsonPropertyFormat(BsonPropertyFormatType.PascalCase)
-public class User2 implements Entity<Long>, AutoIncr {
+public class Mall implements Entity<String>{
 
     @BsonId()
-    private Long id;
+    private String id;
 
     private String name;
 
-    private LocalDateTime createTime;
-
-    public Long getId() {
+    @Override
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    @Override
+    public void setId(String id) {
         this.id = id;
     }
+
 
     public String getName() {
         return name;
@@ -30,10 +30,6 @@ public class User2 implements Entity<Long>, AutoIncr {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public User2() {
-        id = 0L;
     }
 
 }

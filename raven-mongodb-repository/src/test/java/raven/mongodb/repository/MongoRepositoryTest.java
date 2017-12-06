@@ -29,11 +29,23 @@ public class MongoRepositoryTest {
         MongoRepository<User, Long> repos = new UserRepositoryImpl();
         repos.insert(user);
 
-        Assert.assertNotEquals(user.getId(), 0);
+        Assert.assertNotEquals(user.getId().longValue(), 0);
 
         user = repos.get(user.getId());
         Assert.assertNotNull(user);
         Assert.assertEquals(user.getName(), uuid);
+
+
+
+        Mall mall = new Mall();
+        mall.setName("shopping mall");
+
+        MongoRepository<Mall, String> mall_repos = new MallRepositoryImpl();
+        mall_repos.insert(mall);
+
+
+        //Assert.assertNotNull(mall.getId());
+
     }
 
     @Test
@@ -51,7 +63,7 @@ public class MongoRepositoryTest {
         repos.insertBatch(list);
 
         for (User user : list) {
-            Assert.assertNotEquals(user.getId(), 0);
+            Assert.assertNotEquals(user.getId().longValue(), 0);
         }
 
         long count = repos.count(null);
