@@ -217,7 +217,7 @@ public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
     public FindIterable<TEntity> findOptions(FindIterable<TEntity> findIterable, Bson projection, Bson sort
             , int limit, int skip, BsonValue hint) {
 
-        if (limit > 0) {
+        if (projection != null) {
             findIterable = findIterable.projection(projection);
         }
 
