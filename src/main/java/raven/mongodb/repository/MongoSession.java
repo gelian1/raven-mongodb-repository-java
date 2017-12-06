@@ -55,6 +55,7 @@ public class MongoSession {
         MongoClientURI mongoClientURI = new MongoClientURI(connString);
         _mongoClient = new MongoClient(mongoClientURI);
 
+
         database = _mongoClient.getDatabase(dbName).withReadPreference(this._readPreference).withWriteConcern(this._writeConcern);
     }
 
