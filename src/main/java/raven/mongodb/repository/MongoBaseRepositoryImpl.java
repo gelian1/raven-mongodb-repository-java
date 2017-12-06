@@ -6,18 +6,28 @@ import com.mongodb.client.model.Projections;
 import org.bson.BsonDocument;
 import org.bson.BsonDocumentWrapper;
 import org.bson.BsonValue;
+import org.bson.codecs.Codec;
 import org.bson.codecs.configuration.CodecRegistry;
+import org.bson.codecs.pojo.ClassModel;
+import org.bson.codecs.pojo.Convention;
+import org.bson.codecs.pojo.Conventions;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 
 import raven.data.entity.*;
+import raven.mongodb.repository.conventions.CustomConventions;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 import static org.bson.codecs.configuration.CodecRegistries.fromProviders;
 import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
+import static org.bson.codecs.pojo.Conventions.ANNOTATION_CONVENTION;
+import static org.bson.codecs.pojo.Conventions.CLASS_AND_PROPERTY_CONVENTION;
 
 /**
  * @param <TEntity>
@@ -66,8 +76,11 @@ public abstract class MongoBaseRepositoryImpl<TEntity extends Entity, TKey>
         entityClazz = (Class) params[0];
         keyClazz = (Class) params[1];
 
-        pojoCodecRegistry = fromRegistries(MongoClient.getDefaultCodecRegistry(),
-                fromProviders(PojoCodecProvider.builder().automatic(true).build()));
+        pojoCodecRegistry = MongoClient.getDefaultCodecRegistry();
+
+        ClassModel<TEntity> classModel = ClassModel.builder(entityClazz).conventions(CustomConventions.DEFAULT_CONVENTIONS).build();
+        PojoCodecProvider pojoCodecProvider = PojoCodecProvider.builder().register(classModel).build();
+        pojoCodecRegistry = fromRegistries(pojoCodecRegistry, fromProviders(pojoCodecProvider));
     }
 
     /**
@@ -163,11 +176,10 @@ public abstract class MongoBaseRepositoryImpl<TEntity extends Entity, TKey>
     //#endregion
 
     /**
-     *
      * @param entity
      * @return
      */
-    protected BsonDocument toBsonDocument(TEntity entity){
+    protected BsonDocument toBsonDocument(TEntity entity) {
 
         return new BsonDocumentWrapper<TEntity>(entity, pojoCodecRegistry.get(entityClazz));
     }
