@@ -1,5 +1,6 @@
 package raven.mongodb.repository.Normal;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,9 +32,13 @@ public class MongoRepositoryTest {
         MongoRepository<User, Long> repos = new UserRepositoryImpl();
         repos.insert(user);
 
-        Assert.assertNotEquals(user.getId(), 0);
+        Assert.assertNotEquals(user.getId().longValue(), 0);
 
         user = repos.get(user.getId());
+
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(user);
+
         Assert.assertNotNull(user);
         Assert.assertEquals(user.getName(), uuid);
     }
@@ -53,7 +58,7 @@ public class MongoRepositoryTest {
         repos.insertBatch(list);
 
         for (User user : list) {
-            Assert.assertNotEquals(user.getId(), 0);
+            Assert.assertNotEquals(user.getId().longValue(), 0);
         }
 
         long count = repos.count(null);

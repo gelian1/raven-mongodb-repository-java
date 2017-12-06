@@ -3,5 +3,5 @@ package raven.data.entity;
 /**
  *
  * */
-public interface AutoIncr extends Entity {
+public interface AutoIncr<TKey> extends Entity<TKey> {
 }

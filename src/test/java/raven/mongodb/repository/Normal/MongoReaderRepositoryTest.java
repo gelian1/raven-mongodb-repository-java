@@ -61,7 +61,7 @@ public class MongoReaderRepositoryTest {
         list = repos.getList(null, null, Sorts.descending("_id"), 1, 0);
         Assert.assertNotNull(list.get(0));
         Assert.assertEquals(list.size(), 1);
-        Assert.assertEquals(list.get(0).getId(), 10);
+        Assert.assertEquals(list.get(0).getId().longValue(), 10);
 
     }
 

@@ -2,26 +2,25 @@ package raven.mongodb.repository.Normal;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 import raven.data.entity.AutoIncr;
-import raven.data.entity.EntityLongKey;
 import raven.data.entity.annotations.*;
 
 import java.time.LocalDateTime;
 
 @BsonPropertyFormat(BsonPropertyFormatType.PascalCase)
-public class User2 implements EntityLongKey, AutoIncr {
+public class User2 implements AutoIncr<Long> {
 
     @BsonId()
-    private long id;
+    private Long id;
 
     private String name;
 
     private LocalDateTime createTime;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

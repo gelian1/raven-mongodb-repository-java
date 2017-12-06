@@ -1,14 +1,17 @@
 package raven.mongodb.repository.StringID;
 
 import org.bson.codecs.pojo.annotations.BsonId;
-import raven.data.entity.EntityStringKey;
+import raven.data.entity.Entity;
+import raven.data.entity.annotations.BsonPropertyFormat;
+import raven.data.entity.annotations.BsonPropertyFormatType;
 
 import java.util.*;
 
 /**
  * User实体-自拼接String主键
  */
-public class User_StringID implements EntityStringKey {
+@BsonPropertyFormat(BsonPropertyFormatType.PascalCase)
+public class User_StringID implements Entity<String> {
 
     //主键
     @BsonId

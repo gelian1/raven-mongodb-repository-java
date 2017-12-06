@@ -5,7 +5,7 @@ import raven.data.entity.*;
 import raven.data.entity.annotations.*;
 
 @BsonPropertyFormat(BsonPropertyFormatType.PascalCase)
-public final class User implements EntityLongKey, AutoIncr {
+public final class User implements AutoIncr<Long> {
 
     @BsonId()
     private long id;
@@ -14,11 +14,11 @@ public final class User implements EntityLongKey, AutoIncr {
 
     private int age;
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

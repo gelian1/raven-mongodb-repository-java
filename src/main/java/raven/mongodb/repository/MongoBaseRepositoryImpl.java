@@ -78,6 +78,7 @@ public abstract class MongoBaseRepositoryImpl<TEntity extends Entity, TKey>
 
         pojoCodecRegistry = MongoClient.getDefaultCodecRegistry();
 
+
         ClassModel<TEntity> classModel = ClassModel.builder(entityClazz).conventions(CustomConventions.DEFAULT_CONVENTIONS).build();
         PojoCodecProvider pojoCodecProvider = PojoCodecProvider.builder().register(classModel).build();
         pojoCodecRegistry = fromRegistries(pojoCodecRegistry, fromProviders(pojoCodecProvider));
@@ -257,21 +258,21 @@ public abstract class MongoBaseRepositoryImpl<TEntity extends Entity, TKey>
     /// <param name="entity"></param>
     /// <param name="id"></param>
     protected void assignmentEntityID(TEntity entity, long id) {
-        //Entity<TKey> tEntity = (Entity<TKey>) entity;
+        Entity<TKey> tEntity = (Entity<TKey>) entity;
 
-        if (entity instanceof EntityIntKey) {
+        /*if (entity instanceof EntityIntKey) {
             ((EntityIntKey) entity).setId((int) id);
         } else if (entity instanceof EntityLongKey) {
             ((EntityLongKey) entity).setId(id);
-        }
+        }*/
 
-//        if (keyClazz.equals(Integer.class)) {
-//            ((Entity<Integer>) tEntity).setId((int) id);
-//        } else if (keyClazz.equals(Long.class)) {
-//            ((Entity<Long>) tEntity).setId(id);
-//        } else if (keyClazz.equals(Short.class)) {
-//            ((Entity<Short>) tEntity).setId((short) id);
-//        }
+        if (keyClazz.equals(Integer.class)) {
+            ((Entity<Integer>) tEntity).setId((int) id);
+        } else if (keyClazz.equals(Long.class)) {
+            ((Entity<Long>) tEntity).setId(id);
+        } else if (keyClazz.equals(Short.class)) {
+            ((Entity<Short>) tEntity).setId((short) id);
+        }
 
     }
 
