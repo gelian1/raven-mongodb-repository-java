@@ -6,7 +6,7 @@ import raven.mongodb.repository.MongoRepositoryImpl;
 
 public class User_ObjectIDRepository extends MongoRepositoryImpl<User_ObjectID,ObjectId> {
     public User_ObjectIDRepository(){
-        super("mongodb://218.244.136.30:27018/"
+        super("mongodb://127.0.0.1:27017/"
                 , "RepositoryTest2", null, null, null, null);
     }
 }
