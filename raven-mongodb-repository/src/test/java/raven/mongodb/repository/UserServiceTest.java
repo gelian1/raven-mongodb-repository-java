@@ -2,8 +2,6 @@ package raven.mongodb.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mongodb.MongoClientOptions;
-import com.mongodb.MongoOptions;
 import com.mongodb.MongoWriteException;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.model.Filters;
@@ -11,11 +9,6 @@ import com.mongodb.client.model.Sorts;
 import com.mongodb.client.model.Updates;
 import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
-import org.bson.BsonType;
-import org.bson.BsonValue;
-import org.bson.codecs.configuration.CodecRegistries;
-import org.bson.codecs.configuration.CodecRegistry;
-import org.bson.codecs.pojo.annotations.BsonId;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.junit.Assert;
@@ -27,10 +20,8 @@ import raven.mongodb.repository.StringID.User_StringID;
 import raven.mongodb.repository.StringID.User_StringIDRepository;
 import raven.mongodb.repository.exceptions.FailedException;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
-import static org.junit.Assert.fail;
 
 public class UserServiceTest {
     private List<String> abcList = new ArrayList<String>();

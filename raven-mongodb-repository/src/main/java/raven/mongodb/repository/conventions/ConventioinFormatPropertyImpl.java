@@ -9,8 +9,15 @@ import raven.data.entity.annotations.*;
 
 import java.lang.annotation.Annotation;
 
-public class ConventioinFormatPropertyImpl implements Convention {
+/**
+ *
+ */
+final class ConventioinFormatPropertyImpl implements Convention {
 
+    /**
+     *
+     * @param classModelBuilder
+     */
     @Override
     public void apply(final ClassModelBuilder<?> classModelBuilder) {
 
@@ -33,6 +40,11 @@ public class ConventioinFormatPropertyImpl implements Convention {
     }
 
 
+    /**
+     *
+     * @param classModelBuilder
+     * @param propertyModelBuilder
+     */
     private void formatPropertyAnnotations(final ClassModelBuilder<?> classModelBuilder,
                                             final PropertyModelBuilder<?> propertyModelBuilder) {
 

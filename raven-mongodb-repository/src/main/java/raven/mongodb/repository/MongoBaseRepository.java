@@ -6,6 +6,11 @@ import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
 public interface MongoBaseRepository<TEntity> {
+
+    /**
+     *
+     * @return
+     */
     MongoDatabase getDatabase();
 
     /**

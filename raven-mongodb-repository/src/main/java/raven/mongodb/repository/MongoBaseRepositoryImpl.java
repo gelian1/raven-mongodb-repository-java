@@ -3,6 +3,7 @@ package raven.mongodb.repository;
 import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Projections;
+import com.sun.javafx.tk.TKClipboard;
 import org.bson.BsonDocument;
 import org.bson.BsonDocumentWrapper;
 import org.bson.BsonValue;
@@ -11,6 +12,7 @@ import org.bson.codecs.pojo.ClassModel;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 
+import org.bson.types.ObjectId;
 import raven.data.entity.*;
 import raven.mongodb.repository.conventions.CustomConventions;
 
@@ -25,10 +27,11 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
  * @param <TEntity>
  * @param <TKey>
  */
-public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
+public abstract class MongoBaseRepositoryImpl<TEntity extends Entity<TKey>, TKey>
         implements MongoBaseRepository<TEntity> {
     protected Class<TEntity> entityClazz;
     protected Class<TKey> keyClazz;
+    protected Boolean isAutoIncrClass;
 
     /**
      * Mongo自增长ID数据序列
@@ -67,6 +70,7 @@ public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
         Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
         entityClazz = (Class) params[0];
         keyClazz = (Class) params[1];
+        isAutoIncrClass = Util.AUTO_INCR_CLASS.isAssignableFrom(entityClazz);
 
         pojoCodecRegistry = MongoClient.getDefaultCodecRegistry();
 
@@ -264,6 +268,18 @@ public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
         } else if (keyClazz.equals(Short.class)) {
             ((Entity<Short>) tEntity).setId((short) id);
         }
+
+    }
+
+
+    /// <summary>
+    /// ID赋值
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="id"></param>
+    protected void assignmentEntityID(TEntity entity, ObjectId id) {
+        Entity<ObjectId> tEntity = (Entity<ObjectId>) entity;
+        tEntity.setId(id);
 
     }
 

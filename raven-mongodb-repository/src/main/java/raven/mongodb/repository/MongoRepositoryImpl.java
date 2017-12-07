@@ -7,14 +7,15 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.BsonDocument;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
 import raven.data.entity.*;
 import raven.mongodb.repository.exceptions.FailedException;
 
 import java.util.List;
 
-public class MongoRepositoryImpl<TEntity, TKey>
-        extends MongoReaderRepositoryImpl<TEntity, TKey>
-        implements MongoRepository<TEntity, TKey> {
+public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
+    extends MongoReaderRepositoryImpl<TEntity, TKey>
+    implements MongoRepository<TEntity, TKey> {
 
     //#region 构造函数
 
@@ -74,8 +75,10 @@ public class MongoRepositoryImpl<TEntity, TKey>
     @Override
     public void insert(TEntity entity, WriteConcern writeConcern)
             throws FailedException {
-        if (entity instanceof AutoIncr) {
+        if (isAutoIncrClass) {
             super.createIncID(entity);
+        } else if (keyClazz.equals(Util.OBJECT_ID_CLASS) && ((Entity<ObjectId>) entity).getId() == null) {
+            super.createObjectID(entity);
         }
         super.getCollection(writeConcern).insertOne(entity);
     }
@@ -99,7 +102,7 @@ public class MongoRepositoryImpl<TEntity, TKey>
     public void insertBatch(List<TEntity> entitys, WriteConcern writeConcern)
             throws FailedException {
         //需要自增的实体
-        if (entitys.get(0) instanceof AutoIncr) {
+        if (isAutoIncrClass) {
             int count = entitys.size();
             //自增ID值
             long id = createIncID(count);
@@ -107,6 +110,12 @@ public class MongoRepositoryImpl<TEntity, TKey>
 
             for (TEntity entity : entitys) {
                 assignmentEntityID(entity, ++id);
+            }
+        }else if (keyClazz.equals(Util.OBJECT_ID_CLASS)) {
+            for (TEntity entity : entitys) {
+                if(((Entity<ObjectId>) entity).getId() == null) {
+                    super.createObjectID(entity);
+                }
             }
         }
 
@@ -128,7 +137,7 @@ public class MongoRepositoryImpl<TEntity, TKey>
         bsDoc.remove(Util.PRIMARY_KEY_NAME);
 
         Bson update = new BsonDocument("$set", bsDoc);
-        if (isUpsert && updateEntity instanceof AutoIncr) {
+        if (isUpsert && isAutoIncrClass) {
             id = createIncID();
             update = Updates.combine(update, Updates.setOnInsert(Util.PRIMARY_KEY_NAME, id));
         }

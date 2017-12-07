@@ -8,6 +8,8 @@ import com.mongodb.client.model.*;
 import org.bson.BsonDocument;
 import org.bson.BsonValue;
 import org.bson.conversions.Bson;
+import org.bson.types.ObjectId;
+import raven.data.entity.Entity;
 import raven.mongodb.repository.exceptions.FailedException;
 
 import java.util.ArrayList;
@@ -17,7 +19,7 @@ import java.util.List;
  * @param <TEntity>
  * @param <TKey>
  */
-public class MongoReaderRepositoryImpl<TEntity, TKey>
+public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
         extends MongoBaseRepositoryImpl<TEntity, TKey>
         implements MongoReaderRepository<TEntity, TKey> {
 
@@ -123,6 +125,15 @@ public class MongoReaderRepositoryImpl<TEntity, TKey>
         assignmentEntityID(entity, _id);
     }
 
+    /**
+     * 创建ObjectId
+     *
+     * @param entity
+     */
+    public void createObjectID(TEntity entity) {
+        ObjectId _id = new ObjectId();
+        assignmentEntityID(entity, _id);
+    }
 
     /**
      * 根据id获取实体
