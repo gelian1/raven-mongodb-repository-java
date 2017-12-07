@@ -1,4 +1,4 @@
-package raven.mongodb.repository.StringID;
+package raven.mongodb.repository.stringID;
 
 import org.bson.codecs.pojo.annotations.BsonId;
 import raven.data.entity.Entity;

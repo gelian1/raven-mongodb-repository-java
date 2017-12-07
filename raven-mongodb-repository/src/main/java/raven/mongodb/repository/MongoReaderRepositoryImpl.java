@@ -76,7 +76,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @throws FailedException
      */
     @Override
-    public long createIncID(long inc) throws FailedException {
+    public long createIncID(final long inc) throws FailedException {
         return createIncID(inc, 0);
     }
 
@@ -87,7 +87,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @throws FailedException
      */
     @Override
-    public long createIncID(long inc, int iteration) throws FailedException {
+    public long createIncID(final long inc, final int iteration) throws FailedException {
         long id = 1;
         MongoCollection<BsonDocument> collection = getDatabase().getCollection(super._sequence.getSequenceName(), BsonDocument.class);
         String typeName = getCollectionName();
@@ -103,7 +103,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
             //id = result[super._sequence.getIncrementID()].AsInt64;
             return id;
         } else if (iteration <= 1) {
-            return createIncID(inc, ++iteration);
+            return createIncID(inc, (iteration + 1));
         } else {
             throw new FailedException("Failed to get on the IncID");
         }
@@ -118,7 +118,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @throws FailedException
      */
     @Override
-    public void createIncID(TEntity entity)
+    public void createIncID(final TEntity entity)
             throws FailedException {
         long _id = 0;
         _id = this.createIncID();
@@ -130,7 +130,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      *
      * @param entity
      */
-    public void createObjectID(TEntity entity) {
+    public void createObjectID(final TEntity entity) {
         ObjectId _id = new ObjectId();
         assignmentEntityID(entity, _id);
     }
@@ -142,7 +142,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity get(TKey id) {
+    public TEntity get(final TKey id) {
         return this.get(id, null);
     }
 
@@ -154,7 +154,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity get(TKey id, List<String> includeFields) {
+    public TEntity get(final TKey id, final List<String> includeFields) {
         return this.get(id, includeFields, null);
     }
 
@@ -167,7 +167,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity get(TKey id, List<String> includeFields, Bson sort) {
+    public TEntity get(final TKey id, final List<String> includeFields, final Bson sort) {
         return this.get(id, includeFields, sort, null, null);
     }
 
@@ -182,8 +182,8 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity get(TKey id, List<String> includeFields, Bson sort, BsonValue hint
-            , ReadPreference readPreference) {
+    public TEntity get(final TKey id, final List<String> includeFields, final Bson sort, final BsonValue hint
+            , final ReadPreference readPreference) {
 
         Bson filter = Filters.eq(Util.PRIMARY_KEY_NAME, id);
 
@@ -206,7 +206,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity get(Bson filter) {
+    public TEntity get(final Bson filter) {
         return this.get(filter, null);
     }
 
@@ -218,7 +218,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity get(Bson filter, List<String> includeFields) {
+    public TEntity get(final Bson filter, final List<String> includeFields) {
         return this.get(filter, includeFields, null);
     }
 
@@ -231,7 +231,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity get(Bson filter, List<String> includeFields, Bson sort) {
+    public TEntity get(final Bson filter, final List<String> includeFields, final Bson sort) {
         return this.get(filter, includeFields, sort, null, null);
 
     }
@@ -247,11 +247,12 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity get(Bson filter, List<String> includeFields, Bson sort, BsonValue hint
-            , ReadPreference readPreference) {
+    public TEntity get(final Bson filter, final List<String> includeFields, final Bson sort, final BsonValue hint
+            , final ReadPreference readPreference) {
 
-        if (filter == null) {
-            filter = new BsonDocument();
+        Bson _filter = filter;
+        if (_filter == null) {
+            _filter = new BsonDocument();
         }
 
         Bson projection = null;
@@ -259,7 +260,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
             projection = super.IncludeFields(includeFields);
         }
 
-        FindIterable<TEntity> result = super.getCollection(readPreference).find(filter, entityClazz);
+        FindIterable<TEntity> result = super.getCollection(readPreference).find(_filter, entityClazz);
         result = super.findOptions(result, projection, sort, 1, 0, hint);
 
         return result.first();
@@ -276,7 +277,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public ArrayList<TEntity> getList(Bson filter) {
+    public ArrayList<TEntity> getList(final Bson filter) {
         return this.getList(filter, null);
     }
 
@@ -288,7 +289,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public ArrayList<TEntity> getList(Bson filter, List<String> includeFields) {
+    public ArrayList<TEntity> getList(final Bson filter, final List<String> includeFields) {
         return this.getList(filter, includeFields, null);
     }
 
@@ -301,7 +302,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public ArrayList<TEntity> getList(Bson filter, List<String> includeFields, Bson sort) {
+    public ArrayList<TEntity> getList(final Bson filter, final List<String> includeFields, final Bson sort) {
         return this.getList(filter, includeFields, sort, 0, 0);
     }
 
@@ -316,7 +317,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public ArrayList<TEntity> getList(Bson filter, List<String> includeFields, Bson sort
+    public ArrayList<TEntity> getList(final Bson filter, final List<String> includeFields, final Bson sort
             , int limit, int skip) {
         return this.getList(filter, includeFields, sort, limit, skip, null, null);
     }
@@ -334,13 +335,14 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public ArrayList<TEntity> getList(Bson filter, List<String> includeFields, Bson sort
+    public ArrayList<TEntity> getList(final Bson filter, final List<String> includeFields, final Bson sort
             , int limit, int skip
             , BsonValue hint
             , ReadPreference readPreference) {
 
-        if (filter == null) {
-            filter = new BsonDocument();
+        Bson _filter = filter;
+        if (_filter == null) {
+            _filter = new BsonDocument();
         }
 
         Bson projection = null;
@@ -348,7 +350,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
             projection = super.IncludeFields(includeFields);
         }
 
-        FindIterable<TEntity> result = super.getCollection(readPreference).find(filter, entityClazz);
+        FindIterable<TEntity> result = super.getCollection(readPreference).find(_filter, entityClazz);
         result = super.findOptions(result, projection, sort, limit, skip, hint);
 
         ArrayList<TEntity> list = new ArrayList<>();
@@ -368,7 +370,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public long count(Bson filter) {
+    public long count(final Bson filter) {
         return this.count(filter, 0, 0, null, null);
     }
 
@@ -383,18 +385,19 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public long count(Bson filter, int limit, int skip, BsonValue hint
-            , ReadPreference readPreference) {
+    public long count(final Bson filter, final int limit, final int skip, final BsonValue hint
+            , final ReadPreference readPreference) {
 
-        if (filter == null) {
-            filter = new BsonDocument();
+        Bson _filter = filter;
+        if (_filter == null) {
+            _filter = new BsonDocument();
         }
 
         CountOptions option = new CountOptions();
         option.limit(limit);
         option.limit(skip);
 
-        return super.getCollection(readPreference).count(filter, option);
+        return super.getCollection(readPreference).count(_filter, option);
     }
 
     /**
@@ -404,7 +407,7 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public boolean exists(Bson filter) {
+    public boolean exists(final Bson filter) {
         return exists(filter, null, null);
     }
 
@@ -417,17 +420,18 @@ public class MongoReaderRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public boolean exists(Bson filter, BsonValue hint
-            , ReadPreference readPreference) {
+    public boolean exists(final Bson filter,final  BsonValue hint
+            ,final  ReadPreference readPreference) {
 
-        if (filter == null) {
-            filter = new BsonDocument();
+        Bson _filter = filter;
+        if (_filter == null) {
+            _filter = new BsonDocument();
         }
 
         List<String> includeFields = new ArrayList<>(1);
         includeFields.add(Util.PRIMARY_KEY_NAME);
 
-        return this.get(filter, includeFields, null, hint, readPreference) != null;
+        return this.get(_filter, includeFields, null, hint, readPreference) != null;
     }
 
 }

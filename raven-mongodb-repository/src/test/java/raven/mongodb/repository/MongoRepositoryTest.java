@@ -3,6 +3,8 @@ package raven.mongodb.repository;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import raven.mongodb.repository.entitys.Mall;
+import raven.mongodb.repository.entitys.User;
 
 import java.util.*;
 

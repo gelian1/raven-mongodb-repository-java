@@ -1,6 +1,7 @@
 package raven.mongodb.repository;
 
 import com.mongodb.WriteConcern;
+import raven.mongodb.repository.entitys.Mall;
 
 public class MallRepositoryImpl extends MongoRepositoryImpl<Mall, String> {
     public MallRepositoryImpl() {

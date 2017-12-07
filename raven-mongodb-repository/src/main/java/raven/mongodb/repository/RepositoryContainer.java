@@ -1,6 +1,7 @@
 package raven.mongodb.repository;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
 /**
  *
@@ -29,17 +30,19 @@ public class RepositoryContainer {
      * @param func
      * @param <T>
      */
-    public static <T extends MongoBaseRepository> void register(Class<T> clazz, Func func) {
+    public static <T extends MongoBaseRepository> void register(final Class<T> clazz, final Supplier<T> func) {
         String k = getKey(clazz);
-        instances.putIfAbsent(k, func.create());
+        instances.putIfAbsent(k, func.get());
     }
 
     /**
+     *
      * @param clazz
      * @param <T>
      * @return
+     * @throws Exception
      */
-    public static <T extends MongoBaseRepository> T resolve(Class<T> clazz)
+    public static <T extends MongoBaseRepository> T resolve(final Class<T> clazz)
             throws Exception {
         String k = getKey(clazz);
         T repos = (T) instances.get(k);
@@ -54,12 +57,8 @@ public class RepositoryContainer {
      * @param <T>
      * @return
      */
-    private static <T> String getKey(Class<T> clazz) {
+    private static <T> String getKey(final Class<T> clazz) {
         return clazz.getName();
-    }
-
-    public interface Func {
-        <T extends MongoBaseRepository> T create();
     }
 
 }

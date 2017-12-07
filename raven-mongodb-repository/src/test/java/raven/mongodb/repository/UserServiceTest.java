@@ -1,7 +1,5 @@
 package raven.mongodb.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mongodb.MongoWriteException;
 import com.mongodb.WriteConcern;
 import com.mongodb.client.model.Filters;
@@ -11,38 +9,32 @@ import com.mongodb.client.result.DeleteResult;
 import com.mongodb.client.result.UpdateResult;
 import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import raven.mongodb.repository.ObjectID.User_ObjectID;
-import raven.mongodb.repository.ObjectID.User_ObjectIDRepository;
-import raven.mongodb.repository.StringID.User_StringID;
-import raven.mongodb.repository.StringID.User_StringIDRepository;
+import org.junit.*;
+import org.junit.runners.MethodSorters;
+import raven.mongodb.repository.objectID.User_ObjectID;
+import raven.mongodb.repository.objectID.User_ObjectIDRepository;
+import raven.mongodb.repository.stringID.User_StringID;
+import raven.mongodb.repository.stringID.User_StringIDRepository;
 import raven.mongodb.repository.exceptions.FailedException;
 
 import java.util.*;
 
 
+@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class UserServiceTest {
-    private List<String> abcList = new ArrayList<String>();
+    private static List<String> abcList = new ArrayList<String>();
 
-    User_StringIDRepository usRep = null;
-    User_ObjectIDRepository uoRep = null;
+    static User_StringIDRepository usRep = null;
+    static User_ObjectIDRepository uoRep = null;
 
-    @Before
-    public void init(){
-/*
-        CodecRegistry codecRegistry =
-                CodecRegistries.fromRegistries(CodecRegistries.fromCodecs(new UuidCodec(UuidRepresentation.STANDARD)),
-                        MongoClient.getDefaultCodecRegistry());
-
-// globally
-        MongoClientOptions options = MongoClientOptions.builder()
-                .codecRegistry(codecRegistry).build();
-*/
+    @BeforeClass
+    public static void init(){
 
         usRep = new User_StringIDRepository();
         uoRep = new User_ObjectIDRepository();
+
+        usRep.getDatabase().getCollection(usRep.getCollectionName()).drop();
+        uoRep.getDatabase().getCollection(usRep.getCollectionName()).drop();
 
         //#region 初始化abcList
         abcList.add("a");
@@ -156,11 +148,33 @@ public class UserServiceTest {
      * @throws FailedException
      */
     @Test(expected = MongoWriteException.class)
-    public  void  Insert() throws FailedException {
+    public  void  a01Insert() throws FailedException {
+        //#region InsertBatch
+        //循环次数
+        int forCount = GetRandomInt(50,1000);
+        ArrayList<User_StringID> usList = new ArrayList<>();
+        for (int i =0;i<forCount;i++){
+            int random1 = GetRandomInt(0,26);
+            int random2 = GetRandomInt(0,26);
+            //String id = abcList.get(random1) + "_" + abcList.get(random2) + "_" + i;
+            String id = UUID.randomUUID().toString();
+            User_StringID us = null;
+            if(i % 2 == 0){
+                us = GetUS(id,"RandomMan1");
+            }
+            else{
+                us = GetUS(id,"RandomMan2",null,null);
+            }
+            usList.add(us);
+        }
+        usRep.insertBatch(usList);
+        //#endregion
+
         //#region Insert
         User_StringID us2 = GetUS("def_456","aa",null,null);
         usRep.insert(us2);
         Assert.assertEquals(us2.getId(),"def_456");
+        Assert.assertEquals(us2.getName(),"aa");
 
         User_StringID us3 = GetUS("ghi_789","bb",null,null);
         usRep.insert(us3);
@@ -177,28 +191,11 @@ public class UserServiceTest {
         User_StringID us1 = GetUS("abc_123","aa");
         usRep.insert(us1, WriteConcern.ACKNOWLEDGED);
         Assert.assertEquals(us1.getId(),"abc_123");
-        //#endregion
 
-        //#region InsertBatch
-        //循环次数
-        int forCount = GetRandomInt(5,1000);
-        ArrayList<User_StringID> usList = new ArrayList<>();
-        for (int i =0;i<forCount;i++){
-            int random1 = GetRandomInt(0,26);
-            int random2 = GetRandomInt(0,26);
-            String id = abcList.get(random1) + "_" + abcList.get(random2) + "_" + i;
-            User_StringID us = null;
-            if(i % 2 == 0){
-                us = GetUS(id,"RandomMan1");
-            }
-            else{
-                us = GetUS(id,"RandomMan2",null,null);
-            }
-            usList.add(us);
-        }
-        usRep.insertBatch(usList);
+        User_StringID us11 = GetUS("abc_123","aa");
+        usRep.insert(us11, WriteConcern.ACKNOWLEDGED);
+        Assert.assertEquals(us11.getId(),"abc_123");
         //#endregion
-
     }
 
     /**
@@ -208,7 +205,7 @@ public class UserServiceTest {
      * @throws FailedException
      */
     @Test
-    public void Get() throws  FailedException{
+    public void a02Get() throws  FailedException{
         String id = "abc_123";//有
         User_StringID us = usRep.get(id);
         Assert.assertEquals(us.getId(),id);
@@ -225,7 +222,7 @@ public class UserServiceTest {
      * @throws FailedException
      */
     @Test
-    public  void GetList() throws FailedException{
+    public  void a03GetList() throws FailedException{
         String id = "abc_123";//有
         Bson filter = Filters.or(Filters.eq("_id","abc_123"),Filters.eq("_id","def_456"));
         ArrayList<User_StringID> usList1 = usRep.getList(filter);
@@ -234,11 +231,13 @@ public class UserServiceTest {
 
         List<String> includeFields = new ArrayList<>();
         includeFields.add("_id");
-        includeFields.add("classMap");
-        Bson sort = Sorts.descending("name");
+        includeFields.add("ClassMap");
+        includeFields.add("Name");
+        Bson sort = Sorts.descending("Name");
         ArrayList<User_StringID> usList2 = usRep.getList(filter,includeFields,sort,100,1);
         Assert.assertNotNull(usList2);
         Assert.assertTrue(usList2.size() >= 0);
+        Assert.assertNotNull(usList2.get(0).getName());
     }
 
     /**
@@ -250,9 +249,9 @@ public class UserServiceTest {
      * @throws FailedException
      */
     @Test
-    public void Update() throws FailedException{
+    public void a04Update() throws FailedException{
         String id="abc_123";//有
-        UpdateResult updateResult1 = usRep.updateOne(Filters.eq("_id", id), Updates.set("name", "Update_OK"),false,WriteConcern.ACKNOWLEDGED);
+        UpdateResult updateResult1 = usRep.updateOne(Filters.eq("_id", id), Updates.set("Name", "Update_OK"),false,WriteConcern.ACKNOWLEDGED);
         Assert.assertEquals(updateResult1.getMatchedCount(),1);
         Assert.assertTrue(updateResult1.getModifiedCount() <= 1);
 
@@ -262,10 +261,10 @@ public class UserServiceTest {
         Assert.assertEquals(updateResult2.getModifiedCount(),1);
 
         String id2 = "sdsdfsd21f3d123123";//没有
-        UpdateResult updateResult3 = usRep.updateOne(Filters.eq("_id", id2), Updates.set("name", "Update_OK"),true,WriteConcern.ACKNOWLEDGED);
+        UpdateResult updateResult3 = usRep.updateOne(Filters.eq("_id", id2), Updates.set("Name", "Update_OK"),true,WriteConcern.ACKNOWLEDGED);
 
         Bson updateManyFilter = Filters.or(Filters.eq("_id",id),Filters.eq("_id",id2));
-        UpdateResult updateResult4 = usRep.updateMany(updateManyFilter, Updates.set("name", "Update_OK"),WriteConcern.ACKNOWLEDGED);
+        UpdateResult updateResult4 = usRep.updateMany(updateManyFilter, Updates.set("Name", "Update_OK"),WriteConcern.ACKNOWLEDGED);
         Assert.assertTrue(updateResult4.getMatchedCount() >= 1);
         Assert.assertTrue(updateResult4.getModifiedCount() <= 1);
     }
@@ -279,17 +278,17 @@ public class UserServiceTest {
      * @throws FailedException
      */
     @Test
-    public void FindOneAnd() throws FailedException{
+    public void a05FindOneAnd() throws FailedException{
         String id="abc_123";//有
         String id2 = "sdsdfsd21f3d";//没有
         String id3 = "def_456";//有（删除测试）
 
-        User_StringID us = usRep.findOneAndUpdate(Filters.eq("_id",id),Updates.set("name","FOU_OK"),false,Sorts.descending("_id"));
+        User_StringID us = usRep.findOneAndUpdate(Filters.eq("_id",id),Updates.set("Name","FOU_OK"),false,Sorts.descending("_id"));
         Assert.assertNotNull(us);
         Assert.assertEquals(us.getId(),id);
         //Assert.assertEquals(us.getName(),"FOU_OK");
 
-        User_StringID us2 = usRep.findOneAndUpdate(Filters.eq("_id",id2),Updates.set("name","FOU_OK"),false,Sorts.descending("_id"));
+        User_StringID us2 = usRep.findOneAndUpdate(Filters.eq("_id",id2),Updates.set("Name","FOU_OK"),false,Sorts.descending("_id"));
         Assert.assertNull(us2);
 
         User_StringID us3 = usRep.findOneAndDelete(Filters.eq("_id",id2));
@@ -308,7 +307,7 @@ public class UserServiceTest {
      * @throws FailedException
      */
     @Test
-    public  void Delete() throws FailedException{
+    public  void a06Delete() throws FailedException{
         String id = "ghi_789";//有
         String id2="12321dsfdf";//没有
         String id3 = "mno_131415";//有
@@ -332,7 +331,7 @@ public class UserServiceTest {
      * @throws FailedException
      */
     @Test()
-    public  void  InsertObjectID() throws FailedException {
+    public  void  a07InsertObjectID() throws FailedException {
         //#region Insert
         User_ObjectID us1 = GetUO("bb");
         uoRep.insert(us1, WriteConcern.ACKNOWLEDGED);
@@ -380,25 +379,21 @@ public class UserServiceTest {
      * @throws FailedException
      */
     @Test
-    public void GetObjectID() throws FailedException{
-        User_ObjectID uo1 = uoRep.get(new ObjectId("5a27db52cf40cb2b6b0822de")); //取不到数据
-        User_ObjectID uo3 = uoRep.get(Filters.eq("_id","ObjectId(\"5a27db52cf40cb2b6b0822de\")")); //取不到数据
-        User_ObjectID uo5 = uoRep.get(Filters.eq("_id",new ObjectId("5a27db52cf40cb2b6b0822de")));//有数据
+    public void a08GetObjectID() throws FailedException{
+        User_ObjectID getUo = uoRep.get(Filters.eq("Name","bb"));
+        Assert.assertNotNull(getUo);
+
+        User_ObjectID uo1 = uoRep.get(new ObjectId(getUo.getId().toString())); //取不到数据
+        User_ObjectID uo3 = uoRep.get(Filters.eq("_id","ObjectId(\""+ getUo.getId().toString() +"\")")); //取不到数据
+        User_ObjectID uo5 = uoRep.get(Filters.eq("_id",getUo.getId()));//有数据
         Assert.assertNotNull(uo1);
         Assert.assertNotNull(uo1.getId());
 
         //根据ID获取一条实体数据
-        ObjectId id3 = new ObjectId("5a27db52cf40cb2b6b0822de");
+        ObjectId id3 = new ObjectId(getUo.getId().toString());
         User_ObjectID uoModel3 = uoRep.get(id3);
 
         List<User_ObjectID> uoList3 = uoRep.getList(Filters.eq("Name","bb"));
-
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            String json = mapper.writeValueAsString(uoModel3);
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        }
 
         //新增一条实体数据
         User_ObjectID us2 = GetUO("啦啦啦啦11");
@@ -430,7 +425,7 @@ public class UserServiceTest {
      * @throws FailedException
      */
     @Test
-    public void  DeleteObjectID() throws  FailedException{
+    public void  a09DeleteObjectID() throws  FailedException{
         /*Bson filterList = null;
         for(String objID : ObjectIDList){
             Bson filter = Filters.eq("_id",objID);
@@ -453,15 +448,17 @@ public class UserServiceTest {
      * @throws FailedException
      */
     @Test
-    public void UpdateObjectID() throws FailedException{
-        UpdateResult updateResult1 = uoRep.updateOne(Filters.eq("_id", new ObjectId("5a27db52cf40cb2b6b0822de")), Updates.set("Name", "Update_OK"),false,WriteConcern.ACKNOWLEDGED);
+    public void a10UpdateObjectID() throws FailedException{
+        User_ObjectID getUo = uoRep.get(Filters.eq("Name","bb"));
+        Assert.assertNotNull(getUo);
+        UpdateResult updateResult1 = uoRep.updateOne(Filters.eq("_id", getUo.getId()), Updates.set("Name", "Update_OK"),false,WriteConcern.ACKNOWLEDGED);
         Assert.assertEquals(updateResult1.getMatchedCount(),1);
-        Assert.assertEquals(updateResult1.getModifiedCount(),0);
+        Assert.assertEquals(updateResult1.getModifiedCount(),1);
 
         User_ObjectID us = GetUO("UpOK");
-        UpdateResult updateResult2 = uoRep.updateOne(Filters.eq("_id", "5a27db52cf40cb2b6b0822de"), us,true,WriteConcern.ACKNOWLEDGED);
-        Assert.assertEquals(updateResult2.getMatchedCount(),1);
-        Assert.assertEquals(updateResult2.getModifiedCount(),1);
+        UpdateResult updateResult2 = uoRep.updateOne(Filters.eq("_id", getUo.getId().toString()), us,true,WriteConcern.ACKNOWLEDGED);
+        Assert.assertTrue(updateResult2.getMatchedCount() >= 0);
+        Assert.assertTrue(updateResult2.getModifiedCount() >= 0);
     }
     //#endregion
 }

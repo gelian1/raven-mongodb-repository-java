@@ -14,8 +14,8 @@ import raven.mongodb.repository.exceptions.FailedException;
 import java.util.List;
 
 public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
-    extends MongoReaderRepositoryImpl<TEntity, TKey>
-    implements MongoRepository<TEntity, TKey> {
+        extends MongoReaderRepositoryImpl<TEntity, TKey>
+        implements MongoRepository<TEntity, TKey> {
 
     //#region 构造函数
 
@@ -62,7 +62,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @throws FailedException
      */
     @Override
-    public void insert(TEntity entity)
+    public void insert(final TEntity entity)
             throws FailedException {
         this.insert(entity, null);
     }
@@ -73,7 +73,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @throws FailedException
      */
     @Override
-    public void insert(TEntity entity, WriteConcern writeConcern)
+    public void insert(final TEntity entity, final WriteConcern writeConcern)
             throws FailedException {
         if (isAutoIncrClass) {
             super.createIncID(entity);
@@ -88,7 +88,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @throws FailedException
      */
     @Override
-    public void insertBatch(List<TEntity> entitys)
+    public void insertBatch(final List<TEntity> entitys)
             throws FailedException {
         this.insertBatch(entitys, null);
     }
@@ -99,7 +99,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @throws FailedException
      */
     @Override
-    public void insertBatch(List<TEntity> entitys, WriteConcern writeConcern)
+    public void insertBatch(final List<TEntity> entitys, final WriteConcern writeConcern)
             throws FailedException {
         //需要自增的实体
         if (isAutoIncrClass) {
@@ -111,9 +111,9 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
             for (TEntity entity : entitys) {
                 assignmentEntityID(entity, ++id);
             }
-        }else if (keyClazz.equals(Util.OBJECT_ID_CLASS)) {
+        } else if (keyClazz.equals(Util.OBJECT_ID_CLASS)) {
             for (TEntity entity : entitys) {
-                if(((Entity<ObjectId>) entity).getId() == null) {
+                if (((Entity<ObjectId>) entity).getId() == null) {
                     super.createObjectID(entity);
                 }
             }
@@ -130,7 +130,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      * @throws FailedException
      */
-    protected Bson createUpdateBson(TEntity updateEntity, Boolean isUpsert)
+    protected Bson createUpdateBson(final TEntity updateEntity, final Boolean isUpsert)
             throws FailedException {
         long id = 0;
         BsonDocument bsDoc = super.toBsonDocument(updateEntity);
@@ -156,7 +156,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public UpdateResult updateOne(Bson filter, TEntity updateEntity)
+    public UpdateResult updateOne(final Bson filter, final TEntity updateEntity)
             throws FailedException {
         return this.updateOne(filter, updateEntity, false, null);
     }
@@ -171,7 +171,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public UpdateResult updateOne(Bson filter, TEntity updateEntity, Boolean isUpsert, WriteConcern writeConcern)
+    public UpdateResult updateOne(final Bson filter, final TEntity updateEntity, final Boolean isUpsert, final WriteConcern writeConcern)
             throws FailedException {
 
         UpdateOptions options = new UpdateOptions();
@@ -190,7 +190,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public UpdateResult updateOne(Bson filter, Bson update) {
+    public UpdateResult updateOne(final Bson filter, final Bson update) {
 
         UpdateOptions options = new UpdateOptions();
         return super.getCollection().updateOne(filter, update, options);
@@ -206,7 +206,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public UpdateResult updateOne(Bson filter, Bson update, Boolean isUpsert, WriteConcern writeConcern) {
+    public UpdateResult updateOne(final Bson filter, final Bson update, final Boolean isUpsert, final WriteConcern writeConcern) {
 
         UpdateOptions options = new UpdateOptions();
         options.upsert(isUpsert);
@@ -221,7 +221,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public UpdateResult updateMany(Bson filter, Bson update) {
+    public UpdateResult updateMany(final Bson filter, final Bson update) {
         return super.getCollection().updateMany(filter, update);
     }
 
@@ -234,7 +234,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public UpdateResult updateMany(Bson filter, Bson update, WriteConcern writeConcern) {
+    public UpdateResult updateMany(final Bson filter, final Bson update, final WriteConcern writeConcern) {
         return super.getCollection(writeConcern).updateMany(filter, update);
     }
 
@@ -250,7 +250,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity findOneAndUpdate(Bson filter, Bson update) {
+    public TEntity findOneAndUpdate(final Bson filter, final Bson update) {
         return this.findOneAndUpdate(filter, update, false, null);
     }
 
@@ -264,7 +264,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity findOneAndUpdate(Bson filter, Bson update, Boolean isUpsert, Bson sort) {
+    public TEntity findOneAndUpdate(final Bson filter, final Bson update, final Boolean isUpsert, final Bson sort) {
 
         FindOneAndUpdateOptions options = new FindOneAndUpdateOptions();
         options.returnDocument(ReturnDocument.AFTER);
@@ -285,7 +285,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @throws FailedException
      */
     @Override
-    public TEntity findOneAndUpdate(Bson filter, TEntity entity)
+    public TEntity findOneAndUpdate(final Bson filter, final TEntity entity)
             throws FailedException {
         return this.findOneAndUpdate(filter, entity, false, null);
     }
@@ -301,7 +301,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @throws FailedException
      */
     @Override
-    public TEntity findOneAndUpdate(Bson filter, TEntity entity, Boolean isUpsert, Bson sort)
+    public TEntity findOneAndUpdate(final Bson filter, final TEntity entity, final Boolean isUpsert, final Bson sort)
             throws FailedException {
 
         FindOneAndUpdateOptions options = new FindOneAndUpdateOptions();
@@ -323,7 +323,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity findOneAndDelete(Bson filter) {
+    public TEntity findOneAndDelete(final Bson filter) {
         return super.getCollection().findOneAndDelete(filter);
     }
 
@@ -335,7 +335,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public TEntity findOneAndDelete(Bson filter, Bson sort) {
+    public TEntity findOneAndDelete(final Bson filter, final Bson sort) {
 
         FindOneAndDeleteOptions option = new FindOneAndDeleteOptions();
         if (sort != null) {
@@ -354,7 +354,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public DeleteResult deleteOne(TKey id) {
+    public DeleteResult deleteOne(final TKey id) {
         Bson filter = Filters.eq(Util.PRIMARY_KEY_NAME, id);
         return super.getCollection().deleteOne(filter);
     }
@@ -365,7 +365,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public DeleteResult deleteOne(TKey id, WriteConcern writeConcern) {
+    public DeleteResult deleteOne(final TKey id, final WriteConcern writeConcern) {
         Bson filter = Filters.eq(Util.PRIMARY_KEY_NAME, id);
         return super.getCollection(writeConcern).deleteOne(filter);
     }
@@ -375,7 +375,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public DeleteResult deleteOne(Bson filter) {
+    public DeleteResult deleteOne(final Bson filter) {
         return super.getCollection().deleteOne(filter);
     }
 
@@ -385,7 +385,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public DeleteResult deleteOne(Bson filter, WriteConcern writeConcern) {
+    public DeleteResult deleteOne(final Bson filter, final WriteConcern writeConcern) {
         return super.getCollection(writeConcern).deleteOne(filter);
     }
 
@@ -394,7 +394,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public DeleteResult deleteMany(Bson filter) {
+    public DeleteResult deleteMany(final Bson filter) {
         return super.getCollection().deleteMany(filter);
     }
 
@@ -404,7 +404,7 @@ public class MongoRepositoryImpl<TEntity extends Entity<TKey>, TKey>
      * @return
      */
     @Override
-    public DeleteResult deleteMany(Bson filter, WriteConcern writeConcern) {
+    public DeleteResult deleteMany(final Bson filter, final WriteConcern writeConcern) {
         return super.getCollection(writeConcern).deleteMany(filter);
     }
 

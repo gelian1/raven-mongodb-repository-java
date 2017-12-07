@@ -1,4 +1,4 @@
-package raven.mongodb.repository.StringID;
+package raven.mongodb.repository.stringID;
 
 import com.mongodb.WriteConcern;
 import raven.mongodb.repository.MongoRepositoryImpl;

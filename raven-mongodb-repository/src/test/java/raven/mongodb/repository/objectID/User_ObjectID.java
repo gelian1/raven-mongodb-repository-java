@@ -1,4 +1,4 @@
-package raven.mongodb.repository.ObjectID;
+package raven.mongodb.repository.objectID;
 
 import org.bson.codecs.pojo.annotations.*;
 
@@ -8,7 +8,6 @@ import raven.data.entity.annotations.BsonPropertyFormat;
 import raven.data.entity.annotations.BsonPropertyFormatType;
 
 import java.util.Date;
-import java.util.List;
 
 /**
  * User实体-自生成的ObjectId

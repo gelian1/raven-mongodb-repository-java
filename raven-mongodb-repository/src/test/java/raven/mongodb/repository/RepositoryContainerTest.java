@@ -13,6 +13,8 @@ public class RepositoryContainerTest {
         UserRepositoryImpl repos2 = RepositoryContainer.resolve(UserRepositoryImpl.class);
 
         Assert.assertEquals(repos, repos2);
+
+        RepositoryContainer.register(MallRepositoryImpl.class, () -> new MallRepositoryImpl());
     }
 
 

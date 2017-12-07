@@ -1,6 +1,5 @@
-package raven.mongodb.repository.ObjectID;
+package raven.mongodb.repository.objectID;
 
-import com.mongodb.WriteConcern;
 import org.bson.types.ObjectId;
 import raven.mongodb.repository.MongoRepositoryImpl;
 
