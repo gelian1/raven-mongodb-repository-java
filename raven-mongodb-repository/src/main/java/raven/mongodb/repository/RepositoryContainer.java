@@ -1,9 +1,10 @@
 package raven.mongodb.repository;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -11,10 +12,10 @@ import java.util.function.Supplier;
  */
 public class RepositoryContainer {
 
-    private static HashMap<String, Object> instances;
+    private static ConcurrentHashMap<String, Object> instances;
 
     static {
-        instances = new HashMap<>();
+        instances = new ConcurrentHashMap<>();
     }
 
     static void clear() {
@@ -22,10 +23,11 @@ public class RepositoryContainer {
     }
 
     /**
+     *
      * @param service
      * @param <T>
      */
-    public synchronized static <T extends MongoBaseRepository> void register(final T service) {
+    public static <T extends MongoBaseRepository> void register(final T service) {
         Class<?> clazz = service.getClass();
         String k = getKey(clazz);
 
@@ -37,7 +39,7 @@ public class RepositoryContainer {
      * @param service
      * @param <T>
      */
-    public synchronized static <T extends MongoBaseRepository> void register(final Class<T> clazz, final Object service) {
+    public static <T extends MongoBaseRepository> void register(final Class<T> clazz, final Object service) {
         String k = getKey(clazz);
 
         instances.putIfAbsent(k, service);
@@ -48,41 +50,69 @@ public class RepositoryContainer {
      * @param func
      * @param <T>
      */
-    public synchronized static <T extends MongoBaseRepository> void register(final Class<T> clazz, final Supplier<T> func) {
+    public static <T extends MongoBaseRepository> void register(final Class<T> clazz, final Supplier<T> func) {
         String k = getKey(clazz);
         instances.putIfAbsent(k, func.get());
     }
 
     /**
-     * @param packageName
+     * @param packageNames
      */
-    public synchronized static void registerAll(final String packageName) {
+    public static void registerAll(final String... packageNames) {
 
-        List<Class> clazzList = Util.getAllClassByInterface(MongoBaseRepository.class, packageName);
-        MongoBaseRepository repos;
-        for (Class clazz : clazzList) {
-            repos = null;
-            try {
-                Method method = clazz.getDeclaredMethod(Util.CREATE_INSTANCE_METHOD, null);
-                method.setAccessible(true);
-                repos = (MongoBaseRepository) method.invoke(null, null);
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-
-            if (repos == null) {
-                try {
-                    repos = (MongoBaseRepository) clazz.newInstance();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            }
-
+        loadAll((clazz, repos) -> {
             if (repos != null) {
                 register(clazz, repos);
             }
-        }
 
+        }, packageNames);
+    }
+
+    /**
+     * @param service
+     * @param <T>
+     */
+    public static <T extends MongoBaseRepository> void replace(final T service) {
+        Class<?> clazz = service.getClass();
+        String k = getKey(clazz);
+
+        instances.replace(k, service);
+    }
+
+    /**
+     * @param clazz
+     * @param service
+     * @param <T>
+     */
+    public static <T extends MongoBaseRepository> void replace(final Class<T> clazz, final Object service) {
+        String k = getKey(clazz);
+
+        instances.replace(k, service);
+    }
+
+    /**
+     *
+     * @param clazz
+     * @param supplier
+     * @param <T>
+     */
+    public static <T extends MongoBaseRepository> void replace(final Class<T> clazz, final Supplier<T> supplier) {
+        String k = getKey(clazz);
+        instances.replace(k, supplier.get());
+    }
+
+    /**
+     *
+     * @param packageNames
+     */
+    public static void replaceAll(final String... packageNames) {
+
+        loadAll((clazz, repos) -> {
+            if (repos != null) {
+                replace(clazz, repos);
+            }
+
+        }, packageNames);
     }
 
     /**
@@ -102,6 +132,45 @@ public class RepositoryContainer {
     }
 
     /**
+     *
+     * @param biConsumer
+     * @param packageNames
+     * @param <T>
+     */
+    private static <T extends MongoBaseRepository> void loadAll(final BiConsumer<Class<T>, T> biConsumer, final String... packageNames) {
+
+        for (String packageName : packageNames) {
+
+            List<Class> clazzList = Util.getAllClassByInterface(MongoBaseRepository.class, packageName);
+            MongoBaseRepository repos;
+            for (Class clazz : clazzList) {
+                repos = null;
+                try {
+                    Method method = clazz.getDeclaredMethod(Util.CREATE_INSTANCE_METHOD, null);
+                    method.setAccessible(true);
+                    repos = (MongoBaseRepository) method.invoke(null, null);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
+                if (repos == null) {
+                    try {
+                        repos = (MongoBaseRepository) clazz.newInstance();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                }
+
+                biConsumer.accept(clazz, (T) repos);
+                //if (repos != null) {
+                //register(clazz, repos);
+                //}
+            }
+        }
+    }
+
+    /**
+     *
      * @param clazz
      * @param <T>
      * @return
