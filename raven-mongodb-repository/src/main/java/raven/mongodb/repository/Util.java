@@ -20,6 +20,8 @@ class Util {
 
     public static final Class<ObjectId> OBJECT_ID_CLASS = ObjectId.class;
 
+    public static final String CREATE_INSTANCE_METHOD = "createInstance";
+
     /**
      * 取得某个接口下所有实现这个接口的类
      *
