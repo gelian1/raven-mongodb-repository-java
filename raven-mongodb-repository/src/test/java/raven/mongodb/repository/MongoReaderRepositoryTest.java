@@ -5,6 +5,8 @@ import com.mongodb.client.model.Sorts;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import raven.mongodb.repository.entitys.User;
+import raven.mongodb.repository.entitys.User2;
 
 import java.util.*;
 

@@ -1,6 +1,7 @@
 package raven.mongodb.repository;
 
 import com.mongodb.WriteConcern;
+import raven.mongodb.repository.entitys.User;
 
 public class UserRepositoryImpl extends MongoRepositoryImpl<User, Long> {
     public UserRepositoryImpl() {

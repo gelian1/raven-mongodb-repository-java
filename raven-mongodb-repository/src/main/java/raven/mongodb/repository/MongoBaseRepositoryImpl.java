@@ -3,6 +3,7 @@ package raven.mongodb.repository;
 import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Projections;
+import com.sun.javafx.tk.TKClipboard;
 import org.bson.BsonDocument;
 import org.bson.BsonDocumentWrapper;
 import org.bson.BsonValue;
@@ -11,6 +12,7 @@ import org.bson.codecs.pojo.ClassModel;
 import org.bson.codecs.pojo.PojoCodecProvider;
 import org.bson.conversions.Bson;
 
+import org.bson.types.ObjectId;
 import raven.data.entity.*;
 import raven.mongodb.repository.conventions.CustomConventions;
 
@@ -25,10 +27,11 @@ import static org.bson.codecs.configuration.CodecRegistries.fromRegistries;
  * @param <TEntity>
  * @param <TKey>
  */
-public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
+public abstract class MongoBaseRepositoryImpl<TEntity extends Entity<TKey>, TKey>
         implements MongoBaseRepository<TEntity> {
     protected Class<TEntity> entityClazz;
     protected Class<TKey> keyClazz;
+    protected Boolean isAutoIncrClass;
 
     /**
      * Mongo自增长ID数据序列
@@ -67,6 +70,7 @@ public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
         Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
         entityClazz = (Class) params[0];
         keyClazz = (Class) params[1];
+        isAutoIncrClass = Util.AUTO_INCR_CLASS.isAssignableFrom(entityClazz);
 
         pojoCodecRegistry = MongoClient.getDefaultCodecRegistry();
 
@@ -141,7 +145,7 @@ public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
      * @see WriteConcern
      */
     @Override
-    public MongoCollection<TEntity> getCollection(WriteConcern writeConcern) {
+    public MongoCollection<TEntity> getCollection(final WriteConcern writeConcern) {
         MongoCollection<TEntity> collection = this.getCollection();
         if (writeConcern != null) {
             collection = collection.withWriteConcern(writeConcern);
@@ -157,7 +161,7 @@ public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
      * @see ReadPreference
      */
     @Override
-    public MongoCollection<TEntity> getCollection(ReadPreference readPreference) {
+    public MongoCollection<TEntity> getCollection(final ReadPreference readPreference) {
         MongoCollection<TEntity> collection = this.getCollection();
         if (readPreference != null) {
             collection = collection.withReadPreference(readPreference);
@@ -171,7 +175,7 @@ public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
      * @param entity
      * @return
      */
-    protected BsonDocument toBsonDocument(TEntity entity) {
+    protected BsonDocument toBsonDocument(final TEntity entity) {
 
         return new BsonDocumentWrapper<TEntity>(entity, pojoCodecRegistry.get(entityClazz));
     }
@@ -180,7 +184,7 @@ public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
      * @param includeFields
      * @return
      */
-    public Bson IncludeFields(List<String> includeFields) {
+    public Bson IncludeFields(final List<String> includeFields) {
 
         Bson projection = null;
         if (includeFields != null && includeFields.size() > 0) {
@@ -214,31 +218,32 @@ public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
      * @param hint
      * @return
      */
-    public FindIterable<TEntity> findOptions(FindIterable<TEntity> findIterable, Bson projection, Bson sort
-            , int limit, int skip, BsonValue hint) {
+    public FindIterable<TEntity> findOptions(final FindIterable<TEntity> findIterable, final Bson projection, final Bson sort
+            , final int limit, final int skip, final BsonValue hint) {
 
+        FindIterable<TEntity> filter = findIterable;
         if (projection != null) {
-            findIterable = findIterable.projection(projection);
+            filter = findIterable.projection(projection);
         }
 
         if (limit > 0) {
-            findIterable = findIterable.limit(limit);
+            filter = findIterable.limit(limit);
         }
 
         if (skip > 0) {
-            findIterable = findIterable.skip(skip);
+            filter = findIterable.skip(skip);
         }
 
         if (sort != null) {
-            findIterable = findIterable.sort(sort);
+            filter = findIterable.sort(sort);
         }
 
         if (hint != null) {
             Bson hintBson = new BsonDocument("$hint", hint);
-            findIterable = findIterable.hint(hintBson);
+            filter = findIterable.hint(hintBson);
         }
 
-        return findIterable;
+        return filter;
 
     }
 
@@ -248,8 +253,8 @@ public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
     /// </summary>
     /// <param name="entity"></param>
     /// <param name="id"></param>
-    protected void assignmentEntityID(TEntity entity, long id) {
-        Entity<TKey> tEntity = (Entity<TKey>) entity;
+    protected void assignmentEntityID(final TEntity entity, final long id) {
+        Entity<TKey> tEntity = entity;
 
 //        if (entity instanceof EntityIntKey) {
 //            ((EntityIntKey) entity).setId((int) id);
@@ -264,6 +269,18 @@ public abstract class MongoBaseRepositoryImpl<TEntity, TKey>
         } else if (keyClazz.equals(Short.class)) {
             ((Entity<Short>) tEntity).setId((short) id);
         }
+
+    }
+
+
+    /// <summary>
+    /// ID赋值
+    /// </summary>
+    /// <param name="entity"></param>
+    /// <param name="id"></param>
+    protected void assignmentEntityID(final TEntity entity, final ObjectId id) {
+        Entity<ObjectId> tEntity = (Entity<ObjectId>) entity;
+        tEntity.setId(id);
 
     }
 
