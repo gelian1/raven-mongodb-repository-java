@@ -11,6 +11,7 @@ import org.bson.conversions.Bson;
 import org.bson.types.ObjectId;
 import org.junit.*;
 import org.junit.runners.MethodSorters;
+import raven.mongodb.repository.enumerate.UserType;
 import raven.mongodb.repository.objectID.User_ObjectID;
 import raven.mongodb.repository.objectID.User_ObjectIDRepository;
 import raven.mongodb.repository.stringID.User_StringID;
@@ -459,6 +460,28 @@ public class UserServiceTest {
         UpdateResult updateResult2 = uoRep.updateOne(Filters.eq("_id", getUo.getId().toString()), us,true,WriteConcern.ACKNOWLEDGED);
         Assert.assertTrue(updateResult2.getMatchedCount() >= 0);
         Assert.assertTrue(updateResult2.getModifiedCount() >= 0);
+    }
+
+    /**
+     * 测试类别描述如下：
+     * 1：新增一条有枚举字段的文档，并查看其值在数据库中的表现信息
+     * 2：读取一条有枚举字段的文档，并查看其在实体中的表现信息
+     */
+    @Test
+    public void a11EnumObjectID(){
+        String name = "枚举测试123321";
+        User_ObjectID uo1 = GetUO(name);
+        uo1.setUserType(UserType.GM);
+        try {
+            uoRep.insert(uo1);
+        } catch (FailedException e) {
+            Assert.assertTrue(false);
+        }
+        Bson queryFilter = Filters.eq("Name",name);
+        User_ObjectID uo2 = uoRep.get(queryFilter);
+        Assert.assertNotNull(uo2);
+        Assert.assertNotNull(uo2.getId());
+        Assert.assertTrue(uo2.getUserType() == UserType.GM);
     }
     //#endregion
 }

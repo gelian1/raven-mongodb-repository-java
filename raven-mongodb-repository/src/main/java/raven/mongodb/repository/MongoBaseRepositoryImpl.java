@@ -3,7 +3,6 @@ package raven.mongodb.repository;
 import com.mongodb.*;
 import com.mongodb.client.*;
 import com.mongodb.client.model.Projections;
-import com.sun.javafx.tk.TKClipboard;
 import org.bson.BsonDocument;
 import org.bson.BsonDocumentWrapper;
 import org.bson.BsonValue;

@@ -6,6 +6,7 @@ import org.bson.types.ObjectId;
 import raven.data.entity.*;
 import raven.data.entity.annotations.BsonPropertyFormat;
 import raven.data.entity.annotations.BsonPropertyFormatType;
+import raven.mongodb.repository.enumerate.UserType;
 
 import java.util.Date;
 
@@ -35,6 +36,9 @@ public class User_ObjectID implements Entity<ObjectId> {
     //创建时间
     private Date createTime;
 
+    //用户类型
+    private UserType userType;
+
     //#region 主键
     public ObjectId getId(){return _id;}
 
@@ -53,6 +57,14 @@ public class User_ObjectID implements Entity<ObjectId> {
     public void setCreateTime(Date createTime){this.createTime = createTime;}
     //#endregion
 
+
+    public UserType getUserType() {
+        return userType;
+    }
+
+    public void setUserType(UserType userType) {
+        this.userType = userType;
+    }
 
     public  User_ObjectID(){
         this.createTime = new Date();
