@@ -1,0 +1,36 @@
+<scheme name="MyDarcula" version="142" parent_scheme="Darcula">
+  <metaInfo>
+    <property name="created">2017-12-06T17:24:24</property>
+    <property name="ide">idea</property>
+    <property name="ideVersion">2017.2.4.0.0</property>
+    <property name="modified">2018-01-30T11:05:10</property>
+    <property name="originalScheme">Darcula copy</property>
+  </metaInfo>
+  <attributes>
+    <option name="ABSTRACT_CLASS_NAME_ATTRIBUTES">
+      <value>
+        <option name="FOREGROUND" value="6ca3c9" />
+      </value>
+    </option>
+    <option name="ANONYMOUS_CLASS_NAME_ATTRIBUTES">
+      <value>
+        <option name="FOREGROUND" value="a9b7c6" />
+      </value>
+    </option>
+    <option name="CLASS_NAME_ATTRIBUTES">
+      <value>
+        <option name="FOREGROUND" value="5bc9ae" />
+      </value>
+    </option>
+    <option name="ENUM_NAME_ATTRIBUTES">
+      <value>
+        <option name="FOREGROUND" value="588cc9" />
+      </value>
+    </option>
+    <option name="INTERFACE_NAME_ATTRIBUTES">
+      <value>
+        <option name="FOREGROUND" value="bdc993" />
+      </value>
+    </option>
+  </attributes>
+</scheme>
